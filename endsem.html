@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Student Course Feedback Form</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 600px;
+      margin: 30px auto;
+      padding: 20px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+    }
+
+    h1 {
+      text-align: center;
+    }
+
+    .form-group {
+      margin-bottom: 15px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: bold;
+    }
+
+    input[type="text"],
+    select,
+    textarea,
+    input[type="file"] {
+      width: 100%;
+      padding: 8px;
+      box-sizing: border-box;
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 80px;
+    }
+
+    .error {
+      color: red;
+      font-size: 0.9em;
+      margin-top: 4px;
+    }
+
+    .success-message {
+      display: none;
+      margin-top: 15px;
+      padding: 10px;
+      border-radius: 5px;
+      background-color: #e6ffed;
+      border: 1px solid #34c759;
+      color: #1c7c35;
+      font-weight: bold;
+    }
+
+    button {
+      padding: 10px 20px;
+      cursor: pointer;
+      border: none;
+      background-color: #007bff;
+      color: #fff;
+      border-radius: 4px;
+      font-size: 1rem;
+    }
+
+    button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Course Feedback Form</h1>
+
+  <form id="feedbackForm" novalidate>
+    <!-- Name -->
+    <div class="form-group">
+      <label for="name">Student Name *</label>
+      <input type="text" id="name" name="name" placeholder="Enter your name" />
+      <div class="error" id="nameError"></div>
+    </div>
+
+    <!-- Course -->
+    <div class="form-group">
+      <label for="course">Course *</label>
+      <select id="course" name="course">
+        <option value="">-- Select Course --</option>
+        <option value="Computer Networks">Computer Networks</option>
+        <option value="Operating Systems">Operating Systems</option>
+        <option value="Data Structures">Data Structures</option>
+        <option value="DBMS">DBMS</option>
+      </select>
+      <div class="error" id="courseError"></div>
+    </div>
+
+    <!-- Rating -->
+    <div class="form-group">
+      <label for="rating">Rating (1 to 5) *</label>
+      <select id="rating" name="rating">
+        <option value="">-- Select Rating --</option>
+        <option value="1">1 - Very Poor</option>
+        <option value="2">2 - Poor</option>
+        <option value="3">3 - Average</option>
+        <option value="4">4 - Good</option>
+        <option value="5">5 - Excellent</option>
+      </select>
+      <div class="error" id="ratingError"></div>
+    </div>
+
+    <!-- Comments -->
+    <div class="form-group">
+      <label for="comments">Comments *</label>
+      <textarea id="comments" name="comments" placeholder="Share your feedback"></textarea>
+      <div class="error" id="commentsError"></div>
+    </div>
+
+    <!-- File Upload -->
+    <div class="form-group">
+      <label for="fileUpload">Upload Screenshot/Document (Optional)</label>
+      <input
+        type="file"
+        id="fileUpload"
+        name="fileUpload"
+        accept=".png,.jpg,.jpeg,.pdf,.doc,.docx"
+      />
+      <div class="error" id="fileError"></div>
+      <small>Allowed: .png, .jpg, .jpeg, .pdf, .doc, .docx</small>
+    </div>
+
+    <button type="submit">Submit Feedback</button>
+  </form>
+
+  <div class="success-message" id="successMessage">
+    ✅ Thank you! Your feedback has been submitted successfully.
+  </div>
+
+  <script>
+    const form = document.getElementById('feedbackForm');
+    const successMessage = document.getElementById('successMessage');
+
+    const nameInput = document.getElementById('name');
+    const courseSelect = document.getElementById('course');
+    const ratingSelect = document.getElementById('rating');
+    const commentsInput = document.getElementById('comments');
+    const fileInput = document.getElementById('fileUpload');
+
+    const nameError = document.getElementById('nameError');
+    const courseError = document.getElementById('courseError');
+    const ratingError = document.getElementById('ratingError');
+    const commentsError = document.getElementById('commentsError');
+    const fileError = document.getElementById('fileError');
+
+    function clearErrors() {
+      nameError.textContent = '';
+      courseError.textContent = '';
+      ratingError.textContent = '';
+      commentsError.textContent = '';
+      fileError.textContent = '';
+    }
+
+    form.addEventListener('submit', function (event) {
+      event.preventDefault(); // Stop default form submit
+      clearErrors();
+      successMessage.style.display = 'none';
+
+      let isValid = true;
+
+      // Validate name
+      if (!nameInput.value.trim()) {
+        nameError.textContent = 'Name is required.';
+        isValid = false;
+      }
+
+      // Validate course
+      if (!courseSelect.value) {
+        courseError.textContent = 'Please select a course.';
+        isValid = false;
+      }
+
+      // Validate rating
+      if (!ratingSelect.value) {
+        ratingError.textContent = 'Please select a rating.';
+        isValid = false;
+      }
+
+      // Validate comments
+      if (!commentsInput.value.trim()) {
+        commentsError.textContent = 'Please enter your comments.';
+        isValid = false;
+      }
+
+      // Validate file type (if a file is selected)
+      if (fileInput.files.length > 0) {
+        const file = fileInput.files[0];
+        const allowedTypes = [
+          'image/png',
+          'image/jpeg',
+          'application/pdf',
+          'application/msword',
+          'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+        ];
+
+        if (!allowedTypes.includes(file.type)) {
+          fileError.textContent = 'Invalid file type. Please upload a valid document or image.';
+          isValid = false;
+        }
+      }
+
+      if (!isValid) {
+        return;
+      }
+
+      // If valid: log data in console
+      const feedbackData = {
+        name: nameInput.value.trim(),
+        course: courseSelect.value,
+        rating: ratingSelect.value,
+        comments: commentsInput.value.trim(),
+        fileName: fileInput.files.length > 0 ? fileInput.files[0].name : 'No file uploaded'
+      };
+
+      console.log('Feedback Submitted:', feedbackData);
+
+      // Show success message
+      successMessage.style.display = 'block';
+
+      // Optionally reset form
+      form.reset();
+    });
+  </script>
+</body>
+</html>
